@@ -78,4 +78,11 @@ jobs:
 
       - name: Publish to MavenCentral
         run: |
-          ./gradlew publishAllPublicationsToMavenCentral --no-configuration-cache
+          ./gradlew \
+            :landscapist:publishToMavenCentral \
+            :landscapist-core:publishToMavenCentral \
+            :landscapist-image:publishToMavenCentral \
+            :landscapist-animation:publishToMavenCentral \
+            :landscapist-placeholder:publishToMavenCentral \
+            :landscapist-palette:publishToMavenCentral \
+            --no-configuration-cache
