@@ -19,10 +19,11 @@ androidxProfileinstaller = "1.4.1"
 androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.12.0"
 kotlinxSerializationJson = "1.11.0"
-jetbrains-compose = "1.11.1"
+jetbrains-compose = "1.12.0-rc01"
+compose-native = "1.12.10-alpha06"
 # Native runtime for desktop Compose UI tests. Must match the skiko version that
 # jetbrains-compose pulls transitively (org.jetbrains.skiko:skiko).
-skiko = "0.144.6"
+skiko = "0.150.1"
 glide = "5.0.9"
 fresco = "3.7.0"
 coil = "2.7.0"
@@ -30,7 +31,7 @@ coil3 = "3.5.0"
 ktor = "3.5.2"
 okio = "3.18.1"
 atomicfu = "0.27.0"
-palette = "3.1.0"
+palette = "4.0.0-beta02"
 ksp = "2.3.9"
 spotless = "6.21.0"
 
@@ -61,7 +62,7 @@ androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiaut
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
-palette = { group = "com.kmpalette", name = "kmpalette-core", version.ref = "palette" }
+palette = { group = "dev.brahmkshatriya.palette", name = "core", version.ref = "palette" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 fresco = { group = "com.facebook.fresco", name = "fresco", version.ref = "fresco" }
 fresco-okhttp3 = { group = "com.facebook.fresco", name = "imagepipeline-okhttp3", version.ref = "fresco" }
@@ -87,9 +88,12 @@ ktor-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "k
 ktor-engine-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-engine-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-engine-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-engine-curl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor" }
+ktor-engine-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
 ktor-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "atomicfu" }
+skiko = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skiko" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "jetbrains-compose" }
 compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.11.4" }
@@ -98,6 +102,9 @@ jetbrains-compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-tes
 jetbrains-compose-ui-test-junit4 = { group = "org.jetbrains.compose.ui", name = "ui-test-junit4", version.ref = "jetbrains-compose" }
 jetbrains-compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "jetbrains-compose" }
 jetbrains-compose-animation = { group = "org.jetbrains.compose.animation", name = "animation", version.ref = "jetbrains-compose" }
+compose-native-runtime = { group = "dev.brahmkshatriya.compose.runtime", name = "runtime", version.ref = "compose-native" }
+compose-native-ui = { group = "dev.brahmkshatriya.compose.ui", name = "ui", version.ref = "compose-native" }
+compose-native-skiko = { group = "dev.brahmkshatriya.skiko", name = "skiko", version = "0.151.4" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -113,6 +120,7 @@ android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+compose-native = { id = "dev.brahmkshatriya.compose", version.ref = "compose-native" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version.ref = "composeStabilityAnalyzer" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

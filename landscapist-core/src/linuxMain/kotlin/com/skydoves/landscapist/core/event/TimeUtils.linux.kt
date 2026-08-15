@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 skydoves
+ * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.skydoves.landscapist.core.event
 
-package com.github.skydoves.landscapist
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import platform.posix.gettimeofday
+import platform.posix.timeval
 
-object Configuration {
-  const val compileSdk = 37
-  const val targetSdk = 36
-  const val minSdk = 21
-  const val minSdk24 = 24
-  const val majorVersion = 2
-  const val minorVersion = 11
-  const val patchVersion = 0
-  const val versionName = "$majorVersion.$minorVersion.$patchVersion"
-  const val versionCode = 131
-  const val snapshotVersionName = "$majorVersion.$minorVersion.${patchVersion + 1}-SNAPSHOT"
-  const val artifactGroup = "dev.brahmkshatriya.landscapist"
+@OptIn(ExperimentalForeignApi::class)
+internal actual fun currentTimeMillis(): Long = memScoped {
+  val value = alloc<timeval>()
+  gettimeofday(value.ptr, null)
+  value.tv_sec * 1_000L + value.tv_usec / 1_000L
 }

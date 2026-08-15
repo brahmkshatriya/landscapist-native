@@ -21,6 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -28,15 +29,20 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     with(target) {
       pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+      pluginManager.apply("dev.brahmkshatriya.compose")
       pluginManager.apply("com.android.library")
       pluginManager.apply("com.vanniktech.maven.publish")
       pluginManager.apply("binary-compatibility-validator")
 
       val libraryExtension = extensions.getByType(LibraryExtension::class.java)
       val kmpExtension = extensions.getByType(KotlinMultiplatformExtension::class.java)
+      val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
       configureKmpLibrary(libraryExtension, kmpExtension)
 
-      val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+      dependencies {
+        add("desktopNativeMainImplementation", libs.findLibrary("compose-native-runtime").get())
+      }
+
       tasks.withType(JavaCompile::class.java).configureEach {
         this.targetCompatibility = libs.findVersion("jvmTarget").get().toString()
         this.sourceCompatibility = libs.findVersion("jvmTarget").get().toString()

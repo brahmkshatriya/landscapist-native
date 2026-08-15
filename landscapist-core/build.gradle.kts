@@ -93,6 +93,18 @@ kotlin {
       }
     }
 
+    linuxMain {
+      dependencies {
+        implementation(libs.ktor.engine.curl)
+      }
+    }
+
+    mingwX64Main {
+      dependencies {
+        implementation(libs.ktor.engine.winhttp)
+      }
+    }
+
     wasmJsMain {
       dependencies {
         implementation(libs.ktor.engine.js)

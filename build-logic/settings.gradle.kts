@@ -4,6 +4,9 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
     repositories {
+        if (providers.gradleProperty("composeNativeLocal").orNull == "true") {
+            mavenLocal()
+        }
         google()
         mavenCentral()
     }

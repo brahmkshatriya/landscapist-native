@@ -2,6 +2,9 @@
 pluginManagement {
   includeBuild("build-logic")
   repositories {
+    if (providers.gradleProperty("composeNativeLocal").orNull == "true") {
+      mavenLocal()
+    }
     google()
     gradlePluginPortal()
     mavenCentral()
@@ -11,6 +14,9 @@ pluginManagement {
 dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
   repositories {
+    if (providers.gradleProperty("composeNativeLocal").orNull == "true") {
+      mavenLocal()
+    }
     google()
     mavenCentral()
     maven(url = "https://plugins.gradle.org/m2/")

@@ -31,6 +31,7 @@ class ComposeMultiplatformLibraryConventionPlugin : Plugin<Project> {
       pluginManager.apply("org.jetbrains.kotlin.multiplatform")
       pluginManager.apply("com.android.library")
       pluginManager.apply("org.jetbrains.compose")
+      pluginManager.apply("dev.brahmkshatriya.compose")
       pluginManager.apply("com.vanniktech.maven.publish")
       pluginManager.apply("binary-compatibility-validator")
       pluginManager.apply("androidx.baselineprofile")
@@ -40,12 +41,19 @@ class ComposeMultiplatformLibraryConventionPlugin : Plugin<Project> {
       configureComposeMultiplatform(libraryExtension, kmpExtension)
 
       val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+      val desktopNativeOverlay = configurations.maybeCreate("desktopNativeMainOverlay").apply {
+        isCanBeConsumed = false
+        isCanBeResolved = false
+      }
       tasks.withType(JavaCompile::class.java).configureEach {
         this.targetCompatibility = libs.findVersion("jvmTarget").get().toString()
         this.sourceCompatibility = libs.findVersion("jvmTarget").get().toString()
       }
 
       dependencies {
+        add("skiaMainImplementation", libs.findLibrary("skiko").get())
+        add("desktopNativeMainImplementation", libs.findLibrary("compose-native-ui").get())
+        add(desktopNativeOverlay.name, libs.findLibrary("compose-native-skiko").get())
         add("baselineProfile", project(":benchmark-landscapist"))
       }
     }

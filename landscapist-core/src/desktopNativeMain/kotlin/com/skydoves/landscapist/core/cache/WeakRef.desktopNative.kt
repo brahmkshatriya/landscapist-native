@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 skydoves
+ * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.skydoves.landscapist.core.cache
 
-package com.github.skydoves.landscapist
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.ref.WeakReference
 
-object Configuration {
-  const val compileSdk = 37
-  const val targetSdk = 36
-  const val minSdk = 21
-  const val minSdk24 = 24
-  const val majorVersion = 2
-  const val minorVersion = 11
-  const val patchVersion = 0
-  const val versionName = "$majorVersion.$minorVersion.$patchVersion"
-  const val versionCode = 131
-  const val snapshotVersionName = "$majorVersion.$minorVersion.${patchVersion + 1}-SNAPSHOT"
-  const val artifactGroup = "dev.brahmkshatriya.landscapist"
+@OptIn(ExperimentalNativeApi::class)
+public actual class WeakRef<T : Any> actual constructor(referent: T) {
+  private val ref = WeakReference(referent)
+
+  public actual fun get(): T? = ref.get()
+
+  public actual fun clear() {
+    ref.clear()
+  }
 }

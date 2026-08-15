@@ -52,6 +52,8 @@ internal fun Project.configureKmpLibrary(
     iosSimulatorArm64()
 
     macosArm64()
+    linuxX64()
+    mingwX64()
 
     @Suppress("OPT_IN_USAGE")
     applyHierarchyTemplate {
@@ -62,6 +64,10 @@ internal fun Project.configureKmpLibrary(
         }
         group("skia") {
           withJvm()
+          group("linux") {
+            withLinuxX64()
+          }
+          withMingwX64()
           group("darwin") {
             group("apple") {
               group("ios") {
