@@ -55,6 +55,7 @@ internal fun Project.configureComposeMultiplatform(
 
     macosArm64()
     linuxX64()
+    linuxArm64()
     mingwX64()
 
     @Suppress("OPT_IN_USAGE")
@@ -68,6 +69,7 @@ internal fun Project.configureComposeMultiplatform(
           withJvm()
           group("linux") {
             withLinuxX64()
+            withLinuxArm64()
           }
           withMingwX64()
           group("darwin") {
