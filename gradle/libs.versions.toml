@@ -20,10 +20,7 @@ androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.12.0"
 kotlinxSerializationJson = "1.11.0"
 jetbrains-compose = "1.12.0-rc01"
-compose-native = "1.12.10-alpha06"
-# Native runtime for desktop Compose UI tests. Must match the skiko version that
-# jetbrains-compose pulls transitively (org.jetbrains.skiko:skiko).
-skiko = "0.150.1"
+compose-native = "1.12.10-alpha12"
 glide = "5.0.9"
 fresco = "3.7.0"
 coil = "2.7.0"
@@ -31,7 +28,7 @@ coil3 = "3.5.0"
 ktor = "3.5.2"
 okio = "3.18.1"
 atomicfu = "0.27.0"
-palette = "4.0.0-beta02"
+palette = "4.0.0-beta03"
 ksp = "2.3.9"
 spotless = "6.21.0"
 
@@ -93,7 +90,6 @@ ktor-engine-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "k
 ktor-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "atomicfu" }
-skiko = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skiko" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "jetbrains-compose" }
 compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.11.4" }
@@ -104,7 +100,6 @@ jetbrains-compose-foundation = { group = "org.jetbrains.compose.foundation", nam
 jetbrains-compose-animation = { group = "org.jetbrains.compose.animation", name = "animation", version.ref = "jetbrains-compose" }
 compose-native-runtime = { group = "dev.brahmkshatriya.compose.runtime", name = "runtime", version.ref = "compose-native" }
 compose-native-ui = { group = "dev.brahmkshatriya.compose.ui", name = "ui", version.ref = "compose-native" }
-compose-native-skiko = { group = "dev.brahmkshatriya.skiko", name = "skiko", version = "0.151.4" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

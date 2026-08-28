@@ -31,6 +31,9 @@ internal fun Project.configureComposeMultiplatformWasm(
 ) {
   pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
+  // Coil 3.5.0 does not publish a MinGW native variant.
+  val supportsMingw = name != "coil3"
+
   kotlinMultiplatformExtension.apply {
     androidTarget { publishLibraryVariants("release") }
     jvm("desktop")
@@ -56,7 +59,9 @@ internal fun Project.configureComposeMultiplatformWasm(
     macosArm64()
     linuxX64()
     linuxArm64()
-    mingwX64()
+    if (supportsMingw) {
+      mingwX64()
+    }
 
     @Suppress("OPT_IN_USAGE")
     applyHierarchyTemplate {
@@ -67,11 +72,13 @@ internal fun Project.configureComposeMultiplatformWasm(
         }
         group("skia") {
           withJvm()
-          group("linux") {
-            withLinuxX64()
-            withLinuxArm64()
+          group("desktopNative") {
+            group("linux") {
+              withLinuxX64()
+              withLinuxArm64()
+            }
+            withMingwX64()
           }
-          withMingwX64()
           group("darwin") {
             group("apple") {
               group("ios") {

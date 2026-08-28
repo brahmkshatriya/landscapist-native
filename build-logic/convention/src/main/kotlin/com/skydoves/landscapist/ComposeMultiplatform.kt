@@ -67,11 +67,13 @@ internal fun Project.configureComposeMultiplatform(
         }
         group("skia") {
           withJvm()
-          group("linux") {
-            withLinuxX64()
-            withLinuxArm64()
+          group("desktopNative") {
+            group("linux") {
+              withLinuxX64()
+              withLinuxArm64()
+            }
+            withMingwX64()
           }
-          withMingwX64()
           group("darwin") {
             group("apple") {
               group("ios") {

@@ -41,19 +41,15 @@ class ComposeMultiplatformWasmLibraryConventionPlugin : Plugin<Project> {
       configureComposeMultiplatformWasm(libraryExtension, kmpExtension)
 
       val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
-      val desktopNativeOverlay = configurations.maybeCreate("desktopNativeMainOverlay").apply {
-        isCanBeConsumed = false
-        isCanBeResolved = false
-      }
       tasks.withType(JavaCompile::class.java).configureEach {
         this.targetCompatibility = libs.findVersion("jvmTarget").get().toString()
         this.sourceCompatibility = libs.findVersion("jvmTarget").get().toString()
       }
 
       dependencies {
-        add("skiaMainImplementation", libs.findLibrary("skiko").get())
+        add("skiaMainImplementation", "org.jetbrains.skiko:skiko:0.150.1")
         add("desktopNativeMainImplementation", libs.findLibrary("compose-native-ui").get())
-        add(desktopNativeOverlay.name, libs.findLibrary("compose-native-skiko").get())
+        add("desktopNativeMainImplementation", "dev.brahmkshatriya.skiko:skiko:0.151.5")
         add("baselineProfile", project(":benchmark-landscapist"))
       }
     }
