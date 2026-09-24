@@ -35,12 +35,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install Android NDK
         shell: bash
-        run: sdkmanager "ndk;28.2.13676358"
+        run: |
+          set -euo pipefail
+          android_sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Library/Android/sdk}}"
+          sdkmanager="$android_sdk/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$sdkmanager"
+          yes | "$sdkmanager" --licenses >/dev/null || true
+          "$sdkmanager" "ndk;28.2.13676358"
 
       - name: Restore Gradle properties and signing key
         shell: bash
