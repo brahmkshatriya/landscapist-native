@@ -6,7 +6,7 @@
 
 @Composable
 public fun com.skydoves.landscapist.fresco.FrescoImage(imageUrl: kotlin.String?, modifier: androidx.compose.ui.Modifier, imageRequest: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<com.facebook.imagepipeline.request.ImageRequestBuilder>, component: com.skydoves.landscapist.components.ImageComponent, imageOptions: com.skydoves.landscapist.ImageOptions, onImageStateChanged: kotlin.Function1<com.skydoves.landscapist.fresco.FrescoImageState, kotlin.Unit>, previewPlaceholder: androidx.compose.ui.graphics.painter.Painter?, loading: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, success: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction3<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \, failure: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction2<androidx.compose.foundation.layout.BoxScope, @[ParameterName(name = \): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - imageUrl: STABLE (class with no mutable properties)
@@ -43,29 +43,29 @@ private fun com.skydoves.landscapist.fresco.FrescoImageThumbnail(requestSize: an
 
 @Composable
 public fun com.skydoves.landscapist.fresco.LocalFrescoProvider.getFrescoImageRequest(imageUrl: kotlin.String?): com.facebook.imagepipeline.request.ImageRequestBuilder
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
     - imageUrl: STABLE (class with no mutable properties)
 
 @Composable
 internal fun com.skydoves.landscapist.fresco.rememberCloseableRef(ref: com.facebook.common.references.CloseableReference<T of com.skydoves.landscapist.fresco.rememberCloseableRef>): T of com.skydoves.landscapist.fresco.rememberCloseableRef
   skippable: false
-  restartable: true
+  restartable: false
   params:
     - ref: UNKNOWN (interface or non-final class; concrete implementation unknown)
 
 @Composable
 public fun com.skydoves.landscapist.fresco.rememberFrescoImageState(initialState: com.skydoves.landscapist.fresco.FrescoImageState, key: kotlin.Any?): androidx.compose.runtime.MutableState<com.skydoves.landscapist.fresco.FrescoImageState>
   skippable: false
-  restartable: true
+  restartable: false
   params:
     - initialState: STABLE (marked @Stable or @Immutable)
     - key: UNKNOWN (interface or non-final class; concrete implementation unknown)
 
 @Composable
 public fun com.skydoves.landscapist.fresco.toFrescoImageState(): com.skydoves.landscapist.fresco.FrescoImageState
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
 

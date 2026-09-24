@@ -33,20 +33,34 @@ public data class CacheKey(
 ) {
   /**
    * The key used for disk cache storage.
-   * Uses SHA-256 hash of the URL with optional size and transformation suffixes.
+   *
+   * The image as it was downloaded, so the URL alone identifies it. Neither the target size nor the
+   * transformations belong here: the disk cache holds the encoded bytes and every size is decoded
+   * from the same ones, so folding either in stored a copy of the same file per size and went back
+   * to the network for each of them.
    */
-  public val diskKey: String by lazy {
-    val base = url.encodeUtf8().sha256().hex()
-    if (transformationKeys.isEmpty() && width == null && height == null) {
-      base
-    } else {
-      val suffix = buildString {
-        transformationKeys.forEach { append("_$it") }
-        if (width != null && height != null) {
-          append("_${width}x$height")
-        }
-      }
-      "${base}_${suffix.hashCode().toString(16)}"
+  // Held in a field rather than behind `by lazy`, which allocates a delegate for every key. A key
+  // is built for every cache lookup and most never reach the disk, so that delegate was a per
+  // lookup allocation to memoise something usually never asked for. The value derives only from
+  // immutable state, so a race can only recompute the same string.
+  private var cachedDiskKey: String? = null
+
+  public val diskKey: String
+    get() = cachedDiskKey ?: url.encodeUtf8().sha256().hex().also { cachedDiskKey = it }
+
+  /**
+   * The key identifying the image without its target size.
+   *
+   * Every [memoryKey] for the same image and transformations shares this prefix, so it groups the
+   * differently sized variants of one image. Used to find any already decoded variant before the
+   * target size is known.
+   */
+  public val baseKey: String = if (transformationKeys.isEmpty()) {
+    url
+  } else {
+    buildString {
+      append(url)
+      transformationKeys.forEach { append("_$it") }
     }
   }
 
@@ -54,15 +68,8 @@ public data class CacheKey(
    * The key used for memory cache storage.
    * Uses the full URL with size and transformation info for faster lookups.
    */
-  public val memoryKey: String by lazy {
-    buildString {
-      append(url)
-      transformationKeys.forEach { append("_$it") }
-      if (width != null && height != null) {
-        append("_${width}x$height")
-      }
-    }
-  }
+  public val memoryKey: String =
+    if (width != null && height != null) "${baseKey}_${width}x$height" else baseKey
 
   public companion object {
     /**

@@ -15,6 +15,7 @@
  */
 
 import com.github.skydoves.landscapist.Configuration
+import com.github.skydoves.landscapist.PublishedModules
 
 plugins {
   kotlin("jvm")
@@ -38,19 +39,8 @@ mavenPublishing {
 
 dependencies {
   constraints {
-    api(project(":landscapist"))
-    api(project(":landscapist-animation"))
-    api(project(":landscapist-palette"))
-    api(project(":landscapist-placeholder"))
-    api(project(":landscapist-transformation"))
-    api(project(":landscapist-zoomable"))
-    api(project(":landscapist-image-gallery"))
-    api(project(":landscapist-core"))
-    api(project(":landscapist-image"))
-    api(project(":glide"))
-    api(project(":coil"))
-    api(project(":coil3"))
-    api(project(":fresco"))
-    api(project(":fresco-websupport"))
+    // The same list the version catalog publishes, so a module cannot reach one and miss the
+    // other. See PublishedModules in buildSrc.
+    PublishedModules.all.forEach { api(project(it.path)) }
   }
 }

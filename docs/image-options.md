@@ -2,6 +2,11 @@
 
 You can provide image options to your Landscapist composable functions by passing an `ImageOptions` instance, as demonstrated in the code below:
 
+!!! tip "Try it in a browser"
+
+    The [playground](https://skydoves.github.io/landscapist/demo/) puts every `ContentScale` on a checkerboard with the image's
+    box outlined, which is the quickest way to see what each one does.
+
 === "Glide"
 
     ```kotlin
@@ -49,6 +54,22 @@ You can provide image options to your Landscapist composable functions by passin
       ..
     )
     ```
+
+### The default options
+
+An image composable you pass no `imageOptions` to falls back to `ImageOptions.Default`, and you can
+reach for it yourself when you want the defaults with one field changed:
+
+```kotlin
+LandscapistImage(
+  imageModel = { url },
+  imageOptions = ImageOptions.Default.copy(contentScale = ContentScale.Fit),
+)
+```
+
+It is one shared instance rather than a fresh `ImageOptions()`. A default argument is re-evaluated
+on every composition, so writing `ImageOptions()` there allocated one per image per frame for a
+value that is always the same.
 
 ### Adjust Requesting Size
 

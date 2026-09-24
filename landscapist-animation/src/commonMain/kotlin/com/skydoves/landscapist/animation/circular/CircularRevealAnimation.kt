@@ -20,21 +20,20 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.painter.Painter
 
 /**
  * This is an extension of the [Painter] for animating a clipping circle to reveal an image.
  * The animation has two states [CircularRevealState.None], [CircularRevealState.Finished].
  *
- * @param imageBitmap an image bitmap for loading the content.
  * @param durationMs milli-second times from start to finish animation.
  */
 @Composable
 internal fun Painter.rememberCircularRevealPainter(
-  imageBitmap: ImageBitmap,
   durationMs: Int,
   onFinishListener: CircularRevealFinishListener? = null,
 ): Painter {
@@ -54,18 +53,23 @@ internal fun Painter.rememberCircularRevealPainter(
   ) { state ->
     when (state) {
       CircularRevealState.None -> 0f
-      CircularRevealState.Finished -> {
-        onFinishListener?.onFinish()
-        1f
-      }
+      CircularRevealState.Finished -> 1f
     }
   }
 
+  // Reported when the transition settles rather than from inside the lambda above. That lambda
+  // says what the radius is for a state, and Compose asks it for every state it needs a value
+  // for, on every recomposition and on every frame, so a listener called from there fired more
+  // than twenty times for one reveal.
+  val currentListener by rememberUpdatedState(onFinishListener)
+  val finished = transitionState.isIdle &&
+    transitionState.currentState == CircularRevealState.Finished
+  LaunchedEffect(finished) {
+    if (finished) currentListener?.onFinish()
+  }
+
   return remember(this) {
-    CircularRevealPainter(
-      imageBitmap = imageBitmap,
-      painter = this,
-    )
+    CircularRevealPainter(painter = this)
   }.also {
     it.radius = radius
   }

@@ -16,6 +16,15 @@
 🌻 <a href="https://skydoves.github.io/landscapist" target="_blank"> Landscapist</a> is a highly optimized, pluggable Jetpack Compose and Kotlin Multiplatform image loading solution that fetches and displays network images, and compatibles with <a href="https://github.com/bumptech/glide" target="_blank"> Glide</a>, <a href="https://github.com/coil-kt/coil" target="_blank"> Coil</a>, and <a href="https://github.com/facebook/fresco" target="_blank"> Fresco.</a> This library supports tracing image loading states, composing custom implementations, and some valuable animations, such as crossfades, blur transformation, and circular reveals. You can also configure and attach image-loading behaviors easily and fast with image plugins. <br><br> <a align="center" href="https://skydoves.github.io/landscapist" target="_blank">See official documentation for Landscapist</a>
 </p>
 
+## Try it in a browser
+
+**[Open the playground](https://skydoves.github.io/landscapist/demo/)** to use Landscapist without
+installing anything. It is `landscapist-image` compiled to WebAssembly, running in the page.
+
+Every image size, content scale and plugin combination is a switch. The panel under the image is
+what the loader reported back, and the panel below that is the Kotlin for whatever you land on,
+with a button to copy it into your project.
+
 ## Who's using Landscapist?
 👉 [Check out who's using Landscapist](https://skydoves.github.io/landscapist/#whos-using-landscapist).
 
@@ -55,187 +64,6 @@ You can see the use cases of this library in the repositories below:
 - [android/storage-samples](https://github.com/android/storage-samples/tree/main/ScopedStorage): Multiple samples showing the best practices in storage APIs on Android.
 - [skydoves/DisneyCompose](https://github.com/skydoves/disneycompose): 🧸 A demo Disney app using Jetpack Compose and Hilt based on modern Android tech-stacks and MVVM architecture.
 - [skydoves/MovieCompose](https://github.com/skydoves/MovieCompose): 🎞 A demo movie app using Jetpack Compose and Hilt based on modern Android tech stacks. <br>
-
-## Landscapist Core & Image
-
-Landscapist now provides two foundational modules designed for Kotlin Multiplatform and Compose Multiplatform from the scratch, giving you full control over image loading across all platforms:
-
-- **`landscapist-core`**: A standalone, Kotlin Multiplatform image loading engine with built-in memory/disk caching, progressive loading, and network fetching via Ktor. Works on Android, iOS, Desktop, and Web without any UI dependencies.
-- **`landscapist-image`**: A Compose Multiplatform image component built on top of `landscapist-core` with full plugin support. Seamlessly works across all Compose Multiplatform targets.
-
-These modules are perfect if you want a lightweight, customizable image loader without depending on Glide, Coil, or Fresco, with first-class support for all Kotlin Multiplatform and Compose Multiplatform targets.
-
-<div class="header">
-  <h1>Landscapist Core</h1>
-</div>
-
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)
-
-The `landscapist-core` module is a complete, Kotlin Multiplatform image loading solution that works standalone without any UI dependencies. It provides:
-
-- **Network image loading** via Ktor HTTP client.
-- **Memory caching** with LRU eviction and weak references.
-- **Disk caching** with size limits and automatic cleanup.
-- **Progressive loading** for better perceived performance.
-- **Priority-based scheduling** for optimized resource usage.
-- **Kotlin Multiplatform** support (Android, iOS, Desktop, Web).
-- **Image transformations** and custom decoders.
-- **Event listeners** for monitoring load states.
-
-### Why Choose Landscapist Core?
-
-Landscapist Core is **exceptionally lightweight** compared to other image loading libraries, making it the ideal choice for SDK and library developers who need to minimize their dependency footprint.
-
-**Core engine AAR size (release build), for the versions this repo depends on:**
-
-| Library | Module | Release AAR | vs landscapist-core |
-|---------|--------|-------------|---------------------|
-| **landscapist-core** | `landscapist-core` | **313 KiB** | baseline |
-| Coil3 | `coil-core` 3.5.0 | 468 KiB | +50% |
-| Glide | `glide` 5.0.7 | 693 KiB | +121% |
-| Fresco | core pipeline artifacts | ~1.0 MiB | roughly 3.3x |
-
-Reproduce with `./gradlew :landscapist-core:assembleRelease && ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar` (320,771 bytes = 313 KiB). This is a single module's AAR, not the full transitive footprint.
-
-Load-time and memory numbers are not published here because they depend on device, OS, and network. Run the included benchmarks (`ImageLibraryBenchmark` instrumentation test and the `:benchmark-landscapist` macrobenchmark) on your own hardware. See the [performance comparison](https://skydoves.github.io/landscapist/landscapist/performance-comparison/) for methodology.
-
-### Setup
-
-Add the dependency below to your **module**'s `build.gradle` file:
-
-```gradle
-dependencies {
-    implementation("com.github.skydoves:landscapist-core:$version")
-}
-```
-
-For Kotlin Multiplatform, add to your **module**'s `build.gradle.kts`:
-
-```kotlin
-sourceSets {
-    commonMain.dependencies {
-        implementation("com.github.skydoves:landscapist-core:$version")
-    }
-}
-```
-
-All platform-specific Ktor engines are included automatically based on your target platforms.
-
-### Using Landscapist Core for Network Loading
-
-You can use `landscapist-core` as a standalone image loader for fetching and caching network images without any UI dependencies. This is useful for pre-loading images, implementing custom image components, or using images in non-Compose contexts.
-
-#### Android Example
-
-This example demonstrates creating a Landscapist instance with custom cache sizes and loading an image from a URL. The result is delivered as a Flow, allowing you to handle loading, success, and failure states reactively.
-
-```kotlin
-import com.skydoves.landscapist.core.Landscapist
-import com.skydoves.landscapist.core.LandscapistConfig
-import com.skydoves.landscapist.core.ImageRequest
-import kotlinx.coroutines.flow.collect
-
-// Create a Landscapist instance (typically once in your app)
-val landscapist = Landscapist.builder(context)
-    .config(
-        LandscapistConfig(
-            memoryCacheSize = 64 * 1024 * 1024L, // 64MB
-            diskCacheSize = 100 * 1024 * 1024L,   // 100MB
-        )
-    )
-    .build()
-
-// Load an image
-lifecycleScope.launch {
-    val request = ImageRequest.builder()
-        .model("https://example.com/image.jpg")
-        .size(width = 800, height = 600)
-        .build()
-
-    landscapist.load(request).collect { result ->
-        when (result) {
-            is ImageResult.Loading -> {
-                // Show loading state
-            }
-            is ImageResult.Success -> {
-                val imageBitmap = result.data
-                // Use the loaded ImageBitmap
-            }
-            is ImageResult.Failure -> {
-                // Handle error
-            }
-        }
-    }
-}
-```
-
-#### Kotlin Multiplatform Example
-
-For non-Android platforms (iOS, Desktop, Web), use the singleton instance which comes pre-configured with sensible defaults. This example shows a simple suspend function that loads an image and returns the ImageBitmap, suitable for use in shared Kotlin Multiplatform code.
-
-```kotlin
-import com.skydoves.landscapist.core.Landscapist
-import com.skydoves.landscapist.core.ImageRequest
-
-// Get the default instance (works on all platforms)
-val landscapist = Landscapist.getInstance()
-
-suspend fun loadImage(url: String): ImageBitmap? {
-    val request = ImageRequest.builder()
-        .model(url)
-        .build()
-
-    var bitmap: ImageBitmap? = null
-    landscapist.load(request).collect { result ->
-        if (result is ImageResult.Success) {
-            bitmap = result.data
-        }
-    }
-    return bitmap
-}
-```
-
-### Advanced Configuration
-
-Customize the Landscapist instance with advanced options including network timeouts, memory optimizations, and event listeners. This example shows how to configure various aspects of the image loader to match your app's specific requirements.
-
-```kotlin
-val landscapist = Landscapist.builder(context)
-    .config(
-        LandscapistConfig(
-            // Memory cache
-            memoryCacheSize = 64 * 1024 * 1024L,
-
-            // Disk cache
-            diskCacheSize = 100 * 1024 * 1024L,
-
-            // Network settings
-            networkConfig = NetworkConfig(
-                connectTimeout = 10.seconds,
-                readTimeout = 30.seconds,
-                userAgent = "MyApp/1.0"
-            ),
-
-            // Performance optimizations
-            allowRgb565 = true,  // Use less memory for images without transparency
-            weakReferencesEnabled = true,
-
-            // Event listener
-            eventListenerFactory = EventListener.Factory { request ->
-                object : EventListener {
-                    override fun onStart(request: ImageRequest) {
-                        println("Started loading: ${request.model}")
-                    }
-
-                    override fun onSuccess(request: ImageRequest, result: ImageResult.Success) {
-                        println("Loaded from: ${result.dataSource}")
-                    }
-                }
-            }
-        )
-    )
-    .build()
-```
 
 <div class="header">
   <h1>Landscapist Image</h1>
@@ -382,11 +210,229 @@ when (currentState) {
 }
 ```
 
+### Drawing the image yourself
+
+A `LandscapistImage` with no slot and no plugin is a single layout node, which draws the image
+itself. Add a `loading`, `success` or `failure` slot or an `ImagePlugin` and it becomes a container,
+and it composes a child inside that container when something actually has to go there. A
+`CrossfadePlugin` does not, since the fade happens inside the painter, and neither does a
+`PainterPlugin` such as `BlurTransformationPlugin`, since the container draws through it.
+
+When all you want is the image, `rememberImagePainter` gives you the painter on its own
+and you keep the node:
+
+```kotlin
+import com.skydoves.landscapist.image.rememberImagePainter
+
+Image(
+    painter = rememberImagePainter(model = "https://example.com/image.jpg"),
+    contentDescription = null,
+    modifier = Modifier.size(120.dp)
+)
+```
+
+It reads the memory cache while it composes, so an already loaded image is drawn in the first frame,
+and it takes the size to decode at from the first draw. There are no loading or failure slots here,
+no `ImagePlugin` and no crossfade, since each of those needs something composed around the image.
+
 ### Supported Image Sources
 
 `LandscapistImage` supports various image sources including network URLs, local files, drawable resources, and more. See the [Landscapist Image documentation](https://skydoves.github.io/landscapist/landscapist-image/#supported-image-sources) for a complete list of supported image sources per platform.
 
----
+## Landscapist Core & Image
+
+Landscapist now provides two foundational modules designed for Kotlin Multiplatform and Compose Multiplatform from the scratch, giving you full control over image loading across all platforms:
+
+- **`landscapist-core`**: A standalone, Kotlin Multiplatform image loading engine with built-in memory/disk caching, progressive loading, and network fetching via Ktor. Works on Android, iOS, Desktop, and Web without any UI dependencies.
+- **`landscapist-image`**: A Compose Multiplatform image component built on top of `landscapist-core` with full plugin support. Seamlessly works across all Compose Multiplatform targets.
+- **`landscapist-svg`**: SVG decoding for `landscapist-core`, rasterized with AndroidSVG on Android and Skia everywhere else. See the [Landscapist SVG documentation](https://skydoves.github.io/landscapist/landscapist/landscapist-svg/).
+
+These modules are perfect if you want a lightweight, customizable image loader without depending on Glide, Coil, or Fresco, with first-class support for all Kotlin Multiplatform and Compose Multiplatform targets.
+
+<div class="header">
+  <h1>Landscapist Core</h1>
+</div>
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/landscapist.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=skydoves%2520landscapist)
+
+The `landscapist-core` module is a complete, Kotlin Multiplatform image loading solution that works standalone without any UI dependencies. It provides:
+
+- **Network image loading** via Ktor HTTP client.
+- **Memory caching** with LRU eviction and weak references.
+- **Disk caching** with size limits and automatic cleanup.
+- **Progressive loading** for better perceived performance.
+- **Priority-based scheduling** for optimized resource usage.
+- **Kotlin Multiplatform** support (Android, iOS, Desktop, Web).
+- **Image transformations** and custom decoders.
+- **Event listeners** for monitoring load states.
+
+### Why Choose Landscapist Core?
+
+Landscapist Core is **exceptionally lightweight** compared to other image loading libraries, making it the ideal choice for SDK and library developers who need to minimize their dependency footprint.
+
+**Core engine AAR size (release build), for the versions this repo depends on:**
+
+| Library | Module | Release AAR | vs landscapist-core |
+|---------|--------|-------------|---------------------|
+| **landscapist-core** | `landscapist-core` | **371 KiB** | baseline |
+| Coil3 | `coil-core` 3.6.2 | 469 KiB | +26% |
+| Glide | `glide` 5.0.9 | 701 KiB | +89% |
+| Fresco | core pipeline artifacts | 1.11 MiB | 3.06x |
+
+Reproduce with `./gradlew :landscapist-core:assembleRelease && ls -l landscapist-core/build/outputs/aar/landscapist-core-release.aar` (379,990 bytes = 371 KiB). This is a single module's AAR, not the full transitive footprint.
+
+Load-time and memory numbers are not published here because they depend on device, OS, and network. Run the included benchmarks (`ImageLibraryBenchmark` instrumentation test and the `:benchmark-landscapist` macrobenchmark) on your own hardware. See the [performance comparison](https://skydoves.github.io/landscapist/landscapist/performance-comparison/) for methodology.
+
+### Setup
+
+Add the dependency below to your **module**'s `build.gradle` file:
+
+```gradle
+dependencies {
+    implementation("com.github.skydoves:landscapist-core:$version")
+}
+```
+
+For Kotlin Multiplatform, add to your **module**'s `build.gradle.kts`:
+
+```kotlin
+sourceSets {
+    commonMain.dependencies {
+        implementation("com.github.skydoves:landscapist-core:$version")
+    }
+}
+```
+
+All platform-specific Ktor engines are included automatically based on your target platforms.
+
+### Using Landscapist Core for Network Loading
+
+You can use `landscapist-core` as a standalone image loader for fetching and caching network images without any UI dependencies. This is useful for pre-loading images, implementing custom image components, or using images in non-Compose contexts.
+
+#### Android Example
+
+This example demonstrates creating a Landscapist instance with custom cache sizes and loading an image from a URL. The result is delivered as a Flow, allowing you to handle loading, success, and failure states reactively.
+
+```kotlin
+import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.core.LandscapistConfig
+import com.skydoves.landscapist.core.ImageRequest
+import kotlinx.coroutines.flow.collect
+
+// Create a Landscapist instance (typically once in your app)
+val landscapist = Landscapist.builder(context)
+    .config(
+        LandscapistConfig(
+            memoryCacheSize = 64 * 1024 * 1024L, // 64MB
+            diskCacheSize = 100 * 1024 * 1024L,   // 100MB
+        )
+    )
+    .build()
+
+// Load an image
+lifecycleScope.launch {
+    val request = ImageRequest.builder()
+        .model("https://example.com/image.jpg")
+        .size(width = 800, height = 600)
+        .build()
+
+    landscapist.load(request).collect { result ->
+        when (result) {
+            is ImageResult.Loading -> {
+                // Show loading state
+            }
+            is ImageResult.Success -> {
+                val imageBitmap = result.data
+                // Use the loaded ImageBitmap
+            }
+            is ImageResult.Failure -> {
+                // Handle error
+            }
+        }
+    }
+}
+```
+
+#### Kotlin Multiplatform Example
+
+For non-Android platforms (iOS, Desktop, Web), use the singleton instance which comes pre-configured with sensible defaults. This example shows a simple suspend function that loads an image and returns the ImageBitmap, suitable for use in shared Kotlin Multiplatform code.
+
+```kotlin
+import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.core.ImageRequest
+
+// Get the default instance (works on all platforms)
+val landscapist = Landscapist.getInstance()
+
+suspend fun loadImage(url: String): ImageBitmap? {
+    val request = ImageRequest.builder()
+        .model(url)
+        .build()
+
+    var bitmap: ImageBitmap? = null
+    landscapist.load(request).collect { result ->
+        if (result is ImageResult.Success) {
+            bitmap = result.data
+        }
+    }
+    return bitmap
+}
+```
+
+### Advanced Configuration
+
+Customize the Landscapist instance with advanced options including network timeouts, memory optimizations, and event listeners. This example shows how to configure various aspects of the image loader to match your app's specific requirements.
+
+```kotlin
+val landscapist = Landscapist.builder(context)
+    .config(
+        LandscapistConfig(
+            // Memory cache
+            memoryCacheSize = 64 * 1024 * 1024L,
+
+            // Disk cache
+            diskCacheSize = 100 * 1024 * 1024L,
+
+            // Network settings
+            networkConfig = NetworkConfig(
+                connectTimeout = 10.seconds,
+                readTimeout = 30.seconds,
+                userAgent = "MyApp/1.0"
+            ),
+
+            // Performance optimizations
+            allowRgb565 = true,  // Use less memory for images without transparency
+            weakReferencesEnabled = true,
+
+            // Event listener
+            eventListenerFactory = EventListener.Factory { request ->
+                object : EventListener {
+                    override fun onStart(request: ImageRequest) {
+                        println("Started loading: ${request.model}")
+                    }
+
+                    override fun onSuccess(request: ImageRequest, result: ImageResult.Success) {
+                        println("Loaded from: ${result.dataSource}")
+                    }
+                }
+            }
+        )
+    )
+    .build()
+```
+
+Leaving the disk cache unset falls through to the default one on disk. Use `noDiskCache()` for a
+loader that writes nothing to disk, and reads nothing back from it:
+
+```kotlin
+val landscapist = Landscapist.builder(context)
+    .noDiskCache()
+    .build()
+```
+
+The disk cache is keyed by the URL, so one download answers every size an image is drawn at. Any
+headers the request carries scope both that key and the memory key, so two requests for one URL with
+different headers do not share an entry.
 
 <div class="header">
   <a href="https://github.com/bumptech/glide" target="_blank"> <img src="https://user-images.githubusercontent.com/24237865/95545537-1bc15200-0a39-11eb-883d-644f564da5d3.png" align="left" width="4%" alt="Glide" /></a>
@@ -408,11 +454,11 @@ Next, add the dependency below to your **module**'s `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.skydoves:landscapist-glide:2.11.0")
+    implementation("com.github.skydoves:landscapist-glide:2.13.2")
 }
 ```
 
-> **Note**: `Landscapist-Glide` includes version `4.16.0` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
+> **Note**: `Landscapist-Glide` includes version `5.0.9` of [Glide](https://github.com/bumptech/glide) internally. So please make sure your project is using the same Glide version or exclude the Glide dependency to adapt yours. Also, please make sure the Jetpack Compose version on the [release page](https://github.com/skydoves/Landscapist/releases).
 
 ### GlideImage
 You can load images simply by using `GlideImage` composable function as the following example below:
@@ -876,6 +922,7 @@ You can compose supported image plugins by Landscapist or you can create your ow
 - **LoadingStatePlugin**: A pluggable state plugin that will be composed while the state is `ImageLoadState.Loading`.
 - **SuccessStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Success`.
 - **FailureStatePlugin**: A pluggable state plugin that will be composed when the state is `ImageLoadState.Failure`.
+- **ComposablePlugin**: A plugin that wraps the image in composable content of its own, such as `ZoomablePlugin`.
 
 For example, you can implement your own `LoadingStatePlugin` that will be composed while loading an image like the below:
 
@@ -901,6 +948,11 @@ data class LoadingPlugin(val source: Any?) : ImagePlugin.LoadingStatePlugin {
   }
 }
 ```
+
+Note the `data class`. A plugin set is compared to decide whether the component an image was handed
+has changed, and images skip when it has not, so a plugin the runtime cannot compare is a new value
+on every composition and costs every image carrying it its skipping. Make a custom plugin a data
+class, or give it `equals` and `hashCode` over whatever configures it.
 
 Next, you can compose plugins by adding them in the `rememberImageComponent` like the below:
 
@@ -1451,6 +1503,34 @@ dependencies {
 }
  ```
 
+
+### Version catalog
+
+The BOM settles versions; it does not save you from writing each coordinate out.
+`landscapist-version-catalog` publishes every Landscapist artifact as a Gradle version catalog, so
+they arrive as aliases with completion in the IDE.
+
+```kotlin
+// settings.gradle.kts
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("landscapistLibs") {
+            from("com.github.skydoves:landscapist-version-catalog:$version")
+        }
+    }
+}
+
+// build.gradle.kts
+dependencies {
+    implementation(landscapistLibs.landscapist.glide)
+    implementation(landscapistLibs.landscapist.placeholder)
+}
+```
+
+The two are not alternatives. The catalog carries coordinates for the lines you write; the BOM
+constrains versions across the whole resolution, including a module that arrives through another
+library. See the [documentation](https://skydoves.github.io/landscapist/bom/) for the full list.
+
  ## Taking Snapshot Images With Paparazzi
 
 [Paparazzi](https://github.com/cashapp/paparazzi) allows you to take snapshot images of your Composable functions without running them on physical devices. You can take proper snapshots images about your images with Paparazzi like the below:
@@ -1473,6 +1553,10 @@ If your project uses Landscapist, please let me know by creating a new issue! �
 ## [Twitter for Android](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)
 
 [![twitter](https://user-images.githubusercontent.com/24237865/125583182-9527dd48-433e-4e17-ae52-3f2bb544a847.jpg)](https://play.google.com/store/apps/details?id=com.twitter.android&hl=ko&gl=US)
+
+## Grab for Android
+
+[![grab](https://play-lh.googleusercontent.com/aJZQVKfrmo-Kl7G3m-_8CrnqEQAsiojdE5yKcUTa8uKUZtcNWagCJJIFrTe1Vl64FvIcAJSZY4ynLsbJG4wa5xg=w240-h480)](https://play.google.com/store/apps/details?id=com.grabtaxi.passenger)
 
 ## Inspiration
 This library was mostly inspired by [Accompanist](https://github.com/chrisbanes/accompanist).<br>

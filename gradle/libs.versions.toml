@@ -5,28 +5,34 @@ jvmTarget = "17"
 nexusPlugin = "0.36.0"
 kotlinxCoroutines = "1.11.0"
 kotlinBinaryCompatibility = "0.18.1"
-androidGradlePlugin = "9.3.1"
+androidGradlePlugin = "9.4.1"
 androidxActivity = "1.13.0"
 androidxMaterial = "1.14.0"
-androidxComposeBom = "2026.06.01"
+androidxComposeBom = "2026.09.00"
 androidxComposeConstraintLayout = "1.1.2"
-androidxCore = "1.19.0"
+androidxCore = "1.19.1"
 androidxTestRunner = "1.7.0"
 androidxTestRules = "1.7.0"
 androidxJunit = "1.3.0"
-androidxMacroBenchmark = "1.5.0-beta01"
+androidxMacroBenchmark = "1.5.0"
 androidxProfileinstaller = "1.4.1"
 androidxUiAutomator = "2.4.0"
-composeStabilityAnalyzer = "0.12.0"
+composeStabilityAnalyzer = "0.15.0"
 kotlinxSerializationJson = "1.11.0"
-jetbrains-compose = "1.12.0-rc01"
-compose-native = "1.12.10-alpha12"
+jetbrains-compose = "1.12.1"
+compose-native = "1.13.0-alpha03"
+skiko-native = "0.153.1"
+# Skia bindings, used directly for SVG rasterizing and for the desktop test runtime. This is a
+# floor: jetbrains-compose contributes a stricter constraint, so resolution lands on its version.
+skiko = "0.150.1"
+# SVG rasterizer for Android, which has no built-in SVG support. Skia targets use skiko instead.
+androidsvg = "1.4"
 glide = "5.0.9"
-fresco = "3.7.0"
+fresco = "3.8.0"
 coil = "2.7.0"
-coil3 = "3.5.0"
-ktor = "3.5.2"
-okio = "3.18.1"
+coil3 = "3.6.3"
+ktor = "3.6.0"
+okio = "3.18.2"
 atomicfu = "0.27.0"
 palette = "4.0.0-beta03"
 ksp = "2.3.9"
@@ -85,14 +91,14 @@ ktor-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "k
 ktor-engine-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-engine-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-engine-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-engine-curl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor" }
-ktor-engine-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
 ktor-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+androidsvg = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvg" }
+skiko = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skiko" }
 atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "atomicfu" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "jetbrains-compose" }
-compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.11.4" }
+compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.12.1" }
 jetbrains-compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test-junit4 = { group = "org.jetbrains.compose.ui", name = "ui-test-junit4", version.ref = "jetbrains-compose" }
@@ -100,6 +106,7 @@ jetbrains-compose-foundation = { group = "org.jetbrains.compose.foundation", nam
 jetbrains-compose-animation = { group = "org.jetbrains.compose.animation", name = "animation", version.ref = "jetbrains-compose" }
 compose-native-runtime = { group = "dev.brahmkshatriya.compose.runtime", name = "runtime", version.ref = "compose-native" }
 compose-native-ui = { group = "dev.brahmkshatriya.compose.ui", name = "ui", version.ref = "compose-native" }
+skiko-native = { group = "dev.brahmkshatriya.skiko", name = "skiko", version.ref = "skiko-native" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

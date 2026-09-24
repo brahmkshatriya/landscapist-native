@@ -22,10 +22,10 @@ object Configuration {
   const val minSdk = 21
   const val minSdk24 = 24
   const val majorVersion = 2
-  const val minorVersion = 11
-  const val patchVersion = 1
+  const val minorVersion = 13
+  const val patchVersion = 2
   const val versionName = "$majorVersion.$minorVersion.$patchVersion"
-  const val versionCode = 132
+  const val versionCode = 136
   const val snapshotVersionName = "$majorVersion.$minorVersion.${patchVersion + 1}-SNAPSHOT"
   const val artifactGroup = "dev.brahmkshatriya.landscapist"
 }

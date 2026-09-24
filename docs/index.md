@@ -8,6 +8,24 @@ This library supports tracing image loading states, enabling you to compose cust
 
 Additionally, Landscapist offers the flexibility to configure and attach image-loading behaviors effortlessly using image plugins, allowing for swift and efficient customization. 
 
+## Try it in a browser
+
+**[Open the playground](https://skydoves.github.io/landscapist/demo/)** to use Landscapist without
+installing anything. It is `landscapist-image` compiled to WebAssembly, running in the page.
+
+Every image size, content scale and plugin combination is a switch. The panel under the image is
+what the loader reported back, and the panel below that is the Kotlin for whatever you land on,
+with a button to copy it into your project.
+
+!!! note "What the browser does differently"
+
+    There is no disk cache on the web, the decoder hands the whole encoded image to Skia rather
+    than sampling it down, and the zoomable plugin cannot decode a region, so it pans and zooms
+    over the one decoded bitmap. The playground says so next to the control each one affects.
+
+    It needs a browser with WebAssembly garbage collection: Chrome 119, Firefox 120, Safari 18.2
+    or newer.
+
 ## Why Landscapist?
 
 Landscapist is a thoughtfully designed solution, meticulously crafted to optimize image loading performance in Jetpack Compose. The majority of its composable functions are marked as **Restartable** and **Skippable**, signifying significant improvements in recomposition performance, as measured by the Compose compiler metrics. Additionally, the library's performance has been enhanced further through the implementation of [Baseline Profiles](https://android-developers.googleblog.com/2022/01/improving-app-performance-with-baseline.html).
@@ -41,6 +59,7 @@ Especially, the global products below are using Landscapist.
 | Product                                                                                                 | Logo                                                                                                                                                                                                                                                                                                                                                                                                                                                         | License                                                                                                               |
 |---------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | [X for Android](https://play.google.com/store/apps/details?id=com.twitter.android)                      | <img src="https://cbx-prod.b-cdn.net/COLOURBOX65107974.jpg" width="160px" />                                                                                                                                                                                                                                                                      | **[License](https://user-images.githubusercontent.com/24237865/125583736-f0ffa76f-8f87-433b-a9fd-192231dc5e63.jpg)**  |
+| [Grab for Android](https://play.google.com/store/apps/details?id=com.grabtaxi.passenger)               | <img src="https://play-lh.googleusercontent.com/aJZQVKfrmo-Kl7G3m-_8CrnqEQAsiojdE5yKcUTa8uKUZtcNWagCJJIFrTe1Vl64FvIcAJSZY4ynLsbJG4wa5xg=w240-h480" width="160px" />                                                                                        | License                                                                                                              |
 | [Azar for Android](https://play.google.com/store/apps/details?id=com.azarlive.android)                  | <img src="https://user-images.githubusercontent.com/24237865/155271118-2bbd5087-58b3-4360-a545-8fe4fc42efc8.jpg" width="62%" />                                                                                                                                                                                                                                                                                                                              | **[License](https://user-images.githubusercontent.com/24237865/155270807-5edcab23-2690-4c05-a068-885ee5558b25.jpeg)** |
 | [KakaoBank](https://play.google.com/store/apps/details?id=com.kakaobank.channel&hl=en)                  | <img src="https://www.kapronasia.com/media/k2/items/cache/36778fed172d9c8502d2d42dc025835b_L.jpg" width="160px" />                                                                                                                                                                                                                                                                                                                            | License                                                                                                               |
 | [Hakuna: Live Streams and Chat](https://play.google.com/store/apps/details?id=com.movefastcompany.bora) | <img src="https://user-images.githubusercontent.com/24237865/218469230-64747182-cda3-443c-b90f-b43728d63ffa.png" width="160px" />                                                                                                                                                                                                                                                                                                                            | License                                                                                                               |

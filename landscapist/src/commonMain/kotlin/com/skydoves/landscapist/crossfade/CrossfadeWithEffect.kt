@@ -18,9 +18,12 @@ package com.skydoves.landscapist.crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.skydoves.landscapist.InternalLandscapistApi
 import kotlinx.coroutines.delay
@@ -35,7 +38,10 @@ import kotlinx.coroutines.delay
  *
  * @param T The type of the state object.
  * @param targetState The state that drives the content to be displayed.
- * @param modifier Modifier to be applied to the container.
+ * @param modifier Modifier to be applied to the container. With the animation off and no modifier
+ * given, no container is emitted at all and the content is composed where the caller put it, which
+ * is one layout node per image rather than two. So do not alternate between [Modifier] and a real
+ * one: that moves the content between two composition groups and rebuilds it every time.
  * @param durationMs The duration of the fade-in and fade-out animations.
  * @param enabled A boolean to enable or disable the animation. If false, the content
  * will switch instantly. Defaults to true.
@@ -53,49 +59,68 @@ public fun <T> CrossfadeWithEffect(
   contentKey: (T) -> Any? = { it },
   content: @Composable (T) -> Unit,
 ) {
-  val currentlyVisibleItems = remember { mutableStateListOf<T>() }
+  if (!enabled) {
+    // With nothing to animate there is nothing to stack, so the wrapper would be a layout node per
+    // image that only forwards its constraints. The parent it would have sat in is a Box with the
+    // same measure policy, alignment and constraint propagation, so removing it cannot move
+    // anything. It is still needed to carry a modifier if one was given.
+    if (modifier === Modifier) {
+      key(contentKey(targetState)) {
+        content(targetState)
+      }
+    } else {
+      Box(modifier = modifier, propagateMinConstraints = true) {
+        key(contentKey(targetState)) {
+          content(targetState)
+        }
+      }
+    }
+    return
+  }
+
+  // Seeded with the entry state, so the first frame is not empty and content already resolved when
+  // the composable appeared has nothing to fade in from. Only later arrivals animate.
+  //
+  // Inside this branch on purpose: a crossfade enabled later must start from what is on screen, not
+  // from the state the composable first entered with.
+  val currentlyVisibleItems = remember { mutableStateListOf(targetState) }
+  val initialContentKey = remember { contentKey(targetState) }
+  // Once something else has been the target, the initial state has stopped being the one that was
+  // already on screen, so coming back to it animates like any other arrival.
+  var initialContentReplaced by remember { mutableStateOf(false) }
 
   LaunchedEffect(targetState) {
-    if (!currentlyVisibleItems.any { contentKey(it) == contentKey(targetState) }) {
+    val key = contentKey(targetState)
+    if (key != initialContentKey) {
+      initialContentReplaced = true
+    }
+    if (!currentlyVisibleItems.any { contentKey(it) == key }) {
       currentlyVisibleItems.add(targetState)
     }
   }
 
   Box(modifier = modifier, propagateMinConstraints = true) {
-    if (enabled) {
-      currentlyVisibleItems.forEach { state ->
-        key(contentKey(state)) {
-          val isTarget = contentKey(state) == contentKey(targetState)
+    currentlyVisibleItems.forEach { state ->
+      key(contentKey(state)) {
+        val stateKey = contentKey(state)
+        val isTarget = stateKey == contentKey(targetState)
 
-          val animationModifier = if (isTarget) {
-            Modifier.fadeInWithEffect(key = contentKey(state) ?: Unit, durationMs = durationMs)
-          } else {
-            Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
-          }
+        val animationModifier = when {
+          !isTarget -> Modifier.fadeOutWithEffect(key = Unit, durationMs = durationMs)
+          !initialContentReplaced && stateKey == initialContentKey -> Modifier
+          else -> Modifier.fadeInWithEffect(key = stateKey ?: Unit, durationMs = durationMs)
+        }
 
-          if (!isTarget) {
-            LaunchedEffect(Unit) {
-              delay(durationMs.toLong())
-              currentlyVisibleItems.remove(state)
-            }
-          }
-
-          Box(modifier = animationModifier, propagateMinConstraints = true) {
-            content(state)
+        if (!isTarget) {
+          LaunchedEffect(Unit) {
+            delay(durationMs.toLong())
+            currentlyVisibleItems.remove(state)
           }
         }
-      }
-    } else {
-      if (currentlyVisibleItems.size > 1 || currentlyVisibleItems.firstOrNull() != targetState) {
-        currentlyVisibleItems.retainAll { contentKey(it) == contentKey(targetState) }
-        if (currentlyVisibleItems.isEmpty()) {
-          currentlyVisibleItems.add(targetState)
-        }
-      }
 
-      // Render the content directly without any animation modifiers.
-      key(contentKey(targetState)) {
-        content(targetState)
+        Box(modifier = animationModifier, propagateMinConstraints = true) {
+          content(state)
+        }
       }
     }
   }

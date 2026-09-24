@@ -40,7 +40,11 @@ public class TwoTierMemoryCache(
   private val lock = SynchronizedObject()
   private val strongCache = linkedMapOf<String, CachedImage>()
   private val weakCache = mutableMapOf<String, WeakRef<CachedImage>>()
+  private val variantIndex = SizeVariantIndex()
   private val currentSize = atomic(0L)
+
+  // The size the weak tier reaches before dead references are swept. See [sweepWeakReferences].
+  private var weakSweepThreshold = MIN_WEAK_SWEEP
 
   override val maxSize: Long
     get() = _maxSize
@@ -74,9 +78,91 @@ public class TwoTierMemoryCache(
 
       // Clean up null weak reference
       weakCache.remove(memoryKey)
+      variantIndex.remove(memoryKey)
     }
 
     null
+  }
+
+  override fun getIgnoringSize(key: CacheKey): CachedImage? = synchronized(lock) {
+    val memoryKey = liveVariantOf(key.baseKey) ?: return@synchronized null
+    val image = strongCache[memoryKey]
+      ?: weakCache[memoryKey]?.get()
+      ?: return@synchronized null
+    // About to be drawn, so give it what get() gives it: a refreshed position and a promotion.
+    touch(memoryKey, image)
+    image
+  }
+
+  override fun getMatching(
+    key: CacheKey,
+    isAcceptable: (CacheKey, CachedImage) -> Boolean,
+  ): CachedImage? = synchronized(lock) {
+    val exact = key.memoryKey
+    // Taken out and put back rather than read then touched: this is the path every hit takes.
+    strongCache.remove(exact)?.let { image ->
+      strongCache[exact] = image
+      return@synchronized image
+    }
+    weakCache[exact]?.get()?.let { image ->
+      touch(exact, image)
+      return@synchronized image
+    }
+    // touch() evicts live entries to make room, so it is applied only to the variant returned.
+    // Every variant is offered, not just the newest, so a thumbnail cannot hide the full entry.
+    var collected: MutableList<String>? = null
+    var found: CachedImage? = null
+    for (variant in variantIndex.variantsOf(key.baseKey)) {
+      val memoryKey = variant.memoryKey
+      val image = strongCache[memoryKey] ?: weakCache[memoryKey]?.get()
+      if (image == null) {
+        (collected ?: mutableListOf<String>().also { collected = it }).add(memoryKey)
+        continue
+      }
+      if (!isAcceptable(variant, image)) continue
+      touch(memoryKey, image)
+      found = image
+      break
+    }
+    collected?.forEach { memoryKey ->
+      weakCache.remove(memoryKey)
+      variantIndex.remove(memoryKey)
+    }
+    found
+  }
+
+  /**
+   * The most recently cached key under [baseKey] that still holds an image.
+   *
+   * Collected keys are dropped on the way, since nothing else prunes them: eviction keeps the key
+   * and [get] only ever sees one.
+   */
+  private fun liveVariantOf(baseKey: String): String? {
+    var live: String? = null
+    var collected: MutableList<String>? = null
+    for (variant in variantIndex.variantsOf(baseKey)) {
+      val memoryKey = variant.memoryKey
+      if (strongCache.containsKey(memoryKey) || weakCache[memoryKey]?.get() != null) {
+        live = memoryKey
+        break
+      }
+      (collected ?: mutableListOf<String>().also { collected = it }).add(memoryKey)
+    }
+    collected?.forEach { memoryKey ->
+      weakCache.remove(memoryKey)
+      variantIndex.remove(memoryKey)
+    }
+    return live
+  }
+
+  /** Moves [image] to the most recent position of the strong cache, promoting it if it was weak. */
+  private fun touch(memoryKey: String, image: CachedImage) {
+    if (strongCache.remove(memoryKey) == null) {
+      weakCache.remove(memoryKey)
+      evictIfNeeded(image.sizeBytes)
+      currentSize.addAndGet(image.sizeBytes)
+    }
+    strongCache[memoryKey] = image
   }
 
   override fun set(key: CacheKey, image: CachedImage): Unit = synchronized(lock) {
@@ -95,6 +181,7 @@ public class TwoTierMemoryCache(
 
     // Add new entry to strong cache
     strongCache[memoryKey] = image
+    variantIndex.add(key)
     currentSize.addAndGet(image.sizeBytes)
   }
 
@@ -103,6 +190,7 @@ public class TwoTierMemoryCache(
 
     // Remove from weak cache
     weakCache.remove(memoryKey)
+    variantIndex.remove(memoryKey)
 
     // Remove from strong cache
     strongCache.remove(memoryKey)?.let { removed ->
@@ -114,7 +202,12 @@ public class TwoTierMemoryCache(
   override fun clear(): Unit = synchronized(lock) {
     strongCache.clear()
     weakCache.clear()
+    variantIndex.clear()
     currentSize.value = 0
+    // The threshold is only ever raised as the tier grows, so a cache that filled once and was then
+    // cleared would keep sweeping at the size it used to be and hold thousands of cleared
+    // references before it looked at them again.
+    weakSweepThreshold = MIN_WEAK_SWEEP
   }
 
   override fun trimToSize(size: Long): Unit = synchronized(lock) {
@@ -144,11 +237,35 @@ public class TwoTierMemoryCache(
   /**
    * Cleans up weak references that have been garbage collected.
    */
-  public fun cleanupWeakReferences(): Unit = synchronized(lock) {
-    val keysToRemove = weakCache.entries
-      .filter { it.value.get() == null }
-      .map { it.key }
-    keysToRemove.forEach { weakCache.remove(it) }
+  public fun cleanupWeakReferences(): Unit = synchronized(lock) { sweepWeakReferences() }
+
+  /**
+   * Drops the weak entries whose image the collector has already taken.
+   *
+   * Nothing else does this. An entry demoted to the weak tier keeps its key there for good, so a
+   * screen that scrolls past a thousand images leaves a thousand dead references behind, and every
+   * young collection has to walk all of them: the cost of demoting one entry grows with every
+   * image the process has ever loaded.
+   *
+   * Sweeping once the tier has doubled since the last sweep is amortised constant per demotion, and
+   * leaves the tier no more than twice the size of what is genuinely still reachable. The floor
+   * keeps small caches from sweeping at all.
+   *
+   * Must be called while holding [lock].
+   */
+  private fun sweepWeakReferences() {
+    val entries = weakCache.entries.iterator()
+    while (entries.hasNext()) {
+      val entry = entries.next()
+      if (entry.value.get() == null) {
+        // Read before the removal. A Kotlin/Native LinkedHashMap entry is a view that checks the
+        // modification count on every access, so reading it afterwards throws there.
+        val memoryKey = entry.key
+        entries.remove()
+        variantIndex.remove(memoryKey)
+      }
+    }
+    weakSweepThreshold = maxOf(MIN_WEAK_SWEEP, weakCache.size * 2)
   }
 
   private fun evictIfNeeded(requiredSpace: Long) {
@@ -162,9 +279,16 @@ public class TwoTierMemoryCache(
     val eldestValue = strongCache.remove(eldestKey) ?: return
     currentSize.addAndGet(-eldestValue.sizeBytes)
 
-    // Move to weak cache if enabled
+    // Move to weak cache if enabled. The entry is still reachable, so it stays in the variant
+    // index; without the weak layer it is gone for good and the index must forget it.
     if (weakReferencesEnabled) {
       weakCache[eldestKey] = WeakRef(eldestValue)
+      if (weakCache.size >= weakSweepThreshold) sweepWeakReferences()
+    } else {
+      variantIndex.remove(eldestKey)
     }
   }
 }
+
+/** The weak tier is left alone below this, so a small cache never pays for a sweep. */
+private const val MIN_WEAK_SWEEP = 64

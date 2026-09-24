@@ -16,8 +16,7 @@
 package com.skydoves.landscapist.image
 
 import androidx.compose.runtime.Composable
-import com.skydoves.landscapist.ProvideImageSourceFile
-import java.io.File
+import androidx.compose.runtime.CompositionLocalProvider
 
 /**
  * Android implementation that provides the disk cache file for sub-sampling.
@@ -28,8 +27,10 @@ public actual fun ProvideImageSource(
   rawData: ByteArray?,
   content: @Composable () -> Unit,
 ) {
-  val file = diskCachePath?.let { File(it) }?.takeIf { it.exists() }
-  ProvideImageSourceFile(file = file) {
+  // Always provided, even when null. Calling this conditionally would put content() in two
+  // different groups, so the whole success subtree would be destroyed and rebuilt the moment a
+  // disk path appeared, resetting anything a plugin remembered.
+  CompositionLocalProvider(imageSourceProvidedValue(diskCachePath, rawData)) {
     content()
   }
 }
