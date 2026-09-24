@@ -42,10 +42,10 @@ dependencies {
   implementation(libs.coil3)
   implementation("io.coil-kt.coil3:coil-compose:${libs.versions.coil3.get()}")
   implementation(compose.desktop.currentOs)
-  implementation(compose.foundation)
+  implementation(libs.jetbrains.compose.foundation)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.okio)
-  runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}")
+  runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skikoOfficial.get()}")
 }
 
 /** Resolves the skiko native runtime classifier (e.g. "macos-arm64") for the running host. */

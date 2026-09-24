@@ -73,6 +73,10 @@ kotlin {
       }
     }
 
+    skiaMain.dependencies {
+      implementation(libs.jetbrains.compose.runtime)
+    }
+
     val desktopTest by getting {
       dependencies {
         implementation(kotlin("test"))
@@ -81,7 +85,7 @@ kotlin {
         // Skiko native runtime for the host OS, required to render off-screen during the
         // desktop runComposeUiTest runs. The classifier is resolved from the running host so the
         // tests also run on CI (e.g. linux-x64).
-        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}")
+        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skikoOfficial.get()}")
       }
     }
   }

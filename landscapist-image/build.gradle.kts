@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import com.github.skydoves.landscapist.Configuration
+import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -81,6 +82,21 @@ kotlin {
       }
     }
 
+    listOf(
+      "linuxX64Main",
+      "linuxArm64Main",
+      "mingwX64Main",
+    ).forEach { sourceSetName ->
+      val generatedDesktopNativeSources =
+        tasks.register<Sync>("prepare${sourceSetName.replaceFirstChar(Char::uppercaseChar)}DesktopNativeSources") {
+          from("src/desktopNativeTargetMain/kotlin")
+          into(layout.buildDirectory.dir("generated/desktopNativeTargetMain/$sourceSetName"))
+        }
+      named(sourceSetName) {
+        kotlin.srcDir(generatedDesktopNativeSources)
+      }
+    }
+
     val desktopTest by getting {
       dependencies {
         implementation(kotlin("test"))
@@ -95,7 +111,7 @@ kotlin {
         // Skiko native runtime for the host OS, required to render off-screen during the
         // desktop runComposeUiTest runs. The classifier is resolved from the running host so the
         // tests also run on CI (e.g. linux-x64).
-        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}")
+        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skikoOfficial.get()}")
       }
     }
   }

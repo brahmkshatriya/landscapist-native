@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "DEPRECATION_ERROR")
+
 /*
  * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
  *
@@ -23,6 +25,22 @@ plugins {
 }
 
 apply(from = "${rootDir}/scripts/publish-module.gradle.kts")
+
+configurations.configureEach {
+  if (name.contains("macosX64", ignoreCase = true)) {
+    resolutionStrategy.eachDependency {
+      if (
+        requested.group == "androidx.compose.runtime" &&
+        requested.name == "runtime-annotation"
+      ) {
+        useTarget(
+          "dev.brahmkshatriya.compose.runtime:runtime-annotation:${libs.versions.compose.native.get()}",
+        )
+        because("AndroidX runtime-annotation does not publish a macOS x64 variant")
+      }
+    }
+  }
+}
 
 /** Resolves the skiko native runtime classifier (e.g. "macos-arm64") for the running host. */
 fun skikoHostTarget(): String {
@@ -66,7 +84,7 @@ kotlin {
         implementation(libs.kotlinx.coroutines.core)
 
         // Compose runtime annotation for stability markers (@Stable, @Immutable)
-        implementation(libs.compose.runtime.annotation)
+        compileOnly(libs.compose.runtime.annotation)
 
         // Ktor for networking
         implementation(libs.ktor.core)
@@ -108,17 +126,17 @@ kotlin {
         // Skia can, and every Compose Multiplatform application already resolves skiko. compileOnly
         // keeps it out of the published dependencies: a plain JVM consumer without it on the
         // classpath falls back to ImageIO, which is what this module used to do everywhere.
-        compileOnly(libs.skiko)
+        compileOnly(libs.skikoOfficial)
       }
     }
 
-    val desktopTest by getting {
+    getByName("desktopTest") {
       dependencies {
         // The decoder tests have to exercise the Skia path, not just the ImageIO fallback, so the
         // API jar and the host's native runtime both have to be on the test classpath.
-        implementation(libs.skiko)
+        implementation(libs.skikoOfficial)
         runtimeOnly(
-          "org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}",
+          "org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skikoOfficial.get()}",
         )
       }
     }
@@ -144,9 +162,11 @@ kotlin {
 
   targets.configureEach {
     compilations.configureEach {
-      compilerOptions.configure {
-        // https://youtrack.jetbrains.com/issue/KT-61573
-        freeCompilerArgs.add("-Xexpect-actual-classes")
+      compileTaskProvider.configure {
+        compilerOptions {
+          // https://youtrack.jetbrains.com/issue/KT-61573
+          freeCompilerArgs.add("-Xexpect-actual-classes")
+        }
       }
     }
   }

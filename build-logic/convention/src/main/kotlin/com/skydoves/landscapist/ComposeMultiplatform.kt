@@ -36,6 +36,20 @@ internal fun Project.configureComposeMultiplatform(
     jvm("desktop")
     jvmToolchain(17)
 
+    js {
+      browser {
+        testTask {
+          enabled = false
+        }
+      }
+      nodejs {
+        testTask {
+          enabled = false
+        }
+      }
+      binaries.library()
+    }
+
     wasmJs {
       browser {
         testTask {
@@ -53,6 +67,7 @@ internal fun Project.configureComposeMultiplatform(
     iosArm64()
     iosSimulatorArm64()
 
+    macosX64()
     macosArm64()
     linuxX64()
     linuxArm64()
@@ -81,6 +96,7 @@ internal fun Project.configureComposeMultiplatform(
                 withIosSimulatorArm64()
               }
               group("macos") {
+                withMacosX64()
                 withMacosArm64()
               }
             }

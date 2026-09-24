@@ -37,6 +37,17 @@ plugins {
 
 apply(from = "${rootDir}/scripts/publish-module.gradle.kts")
 
+configurations.configureEach {
+  if (name.contains("mingwX64", ignoreCase = true)) {
+    resolutionStrategy.eachDependency {
+      if (requested.group == "org.jetbrains.skiko" && requested.name == "skiko") {
+        useTarget("dev.brahmkshatriya.skiko:skiko:${libs.versions.skiko.native.get()}")
+        because("Official Skiko does not publish a MinGW x64 variant")
+      }
+    }
+  }
+}
+
 mavenPublishing {
   val artifactId = "landscapist-svg"
   coordinates(
@@ -81,16 +92,33 @@ kotlin {
     val skiaMain by getting {
       dependencies {
         // Skia renders SVG natively. Every Compose Multiplatform app already resolves skiko, so
-        // this only pins a floor.
-        implementation(libs.skiko)
+        // this only provides the shared source set's compile API. Target source sets publish the
+        // concrete Skiko dependency so MinGW can use the native fork.
+        compileOnly(libs.skikoOfficial)
       }
+    }
+
+    desktopMain.dependencies {
+      implementation(libs.skikoOfficial)
+    }
+
+    darwinMain.dependencies {
+      implementation(libs.skikoOfficial)
+    }
+
+    linuxMain.dependencies {
+      implementation(libs.skikoOfficial)
+    }
+
+    mingwX64Main.dependencies {
+      implementation(libs.skiko.native)
     }
 
     val desktopTest by getting {
       dependencies {
         // Skiko native runtime for the host OS, so the rasterizer really runs during the tests.
         // The classifier is resolved from the running host so the tests also run on CI.
-        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}")
+        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skikoOfficial.get()}")
       }
     }
   }

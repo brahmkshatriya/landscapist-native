@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.4.0"
+kotlin = "2.4.20"
 dokka = "2.2.0"
 jvmTarget = "17"
 nexusPlugin = "0.36.0"
@@ -19,22 +19,22 @@ androidxProfileinstaller = "1.4.1"
 androidxUiAutomator = "2.4.0"
 composeStabilityAnalyzer = "0.15.0"
 kotlinxSerializationJson = "1.11.0"
-jetbrains-compose = "1.12.1"
-compose-native = "1.13.0-alpha03"
+jetbrains-compose = "1.13.0-alpha01"
+compose-native = "1.13.0-alpha05"
 skiko-native = "0.153.1"
 # Skia bindings, used directly for SVG rasterizing and for the desktop test runtime. This is a
 # floor: jetbrains-compose contributes a stricter constraint, so resolution lands on its version.
-skiko = "0.150.1"
+skikoOfficial = "0.152.0-alpha02"
 # SVG rasterizer for Android, which has no built-in SVG support. Skia targets use skiko instead.
 androidsvg = "1.4"
 glide = "5.0.9"
 fresco = "3.8.0"
 coil = "2.7.0"
-coil3 = "3.6.3"
+coil3 = "3.4.0"
 ktor = "3.6.0"
 okio = "3.18.2"
 atomicfu = "0.27.0"
-palette = "4.0.0-beta03"
+palette = "4.0.0-beta05"
 ksp = "2.3.9"
 spotless = "6.21.0"
 
@@ -91,14 +91,16 @@ ktor-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "k
 ktor-engine-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-engine-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-engine-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-engine-curl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor" }
+ktor-engine-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
 ktor-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 androidsvg = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvg" }
-skiko = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skiko" }
+skikoOfficial = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skikoOfficial" }
 atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "atomicfu" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 jetbrains-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "jetbrains-compose" }
-compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.12.1" }
+compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version = "1.13.0-alpha03" }
 jetbrains-compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test-junit4 = { group = "org.jetbrains.compose.ui", name = "ui-test-junit4", version.ref = "jetbrains-compose" }

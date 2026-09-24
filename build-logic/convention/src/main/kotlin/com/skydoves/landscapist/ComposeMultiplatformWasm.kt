@@ -39,6 +39,20 @@ internal fun Project.configureComposeMultiplatformWasm(
     jvm("desktop")
     jvmToolchain(17)
 
+    js {
+      browser {
+        testTask {
+          enabled = false
+        }
+      }
+      nodejs {
+        testTask {
+          enabled = false
+        }
+      }
+      binaries.library()
+    }
+
     wasmJs {
       browser {
         testTask {
@@ -56,6 +70,7 @@ internal fun Project.configureComposeMultiplatformWasm(
     iosArm64()
     iosSimulatorArm64()
 
+    macosX64()
     macosArm64()
     linuxX64()
     linuxArm64()
@@ -77,7 +92,9 @@ internal fun Project.configureComposeMultiplatformWasm(
               withLinuxX64()
               withLinuxArm64()
             }
-            withMingwX64()
+            if (supportsMingw) {
+              withMingwX64()
+            }
           }
           group("darwin") {
             group("apple") {
@@ -86,6 +103,7 @@ internal fun Project.configureComposeMultiplatformWasm(
                 withIosSimulatorArm64()
               }
               group("macos") {
+                withMacosX64()
                 withMacosArm64()
               }
             }

@@ -34,6 +34,20 @@ internal fun Project.configureKmpLibrary(
     jvm("desktop")
     jvmToolchain(17)
 
+    js {
+      browser {
+        testTask {
+          enabled = false
+        }
+      }
+      nodejs {
+        testTask {
+          enabled = false
+        }
+      }
+      binaries.library()
+    }
+
     wasmJs {
       browser {
         testTask {
@@ -51,6 +65,7 @@ internal fun Project.configureKmpLibrary(
     iosArm64()
     iosSimulatorArm64()
 
+    macosX64()
     macosArm64()
     linuxX64()
     linuxArm64()
@@ -65,11 +80,13 @@ internal fun Project.configureKmpLibrary(
         }
         group("skia") {
           withJvm()
-          group("linux") {
-            withLinuxX64()
-            withLinuxArm64()
+          group("desktopNative") {
+            group("linux") {
+              withLinuxX64()
+              withLinuxArm64()
+            }
+            withMingwX64()
           }
-          withMingwX64()
           group("darwin") {
             group("apple") {
               group("ios") {
@@ -77,6 +94,7 @@ internal fun Project.configureKmpLibrary(
                 withIosSimulatorArm64()
               }
               group("macos") {
+                withMacosX64()
                 withMacosArm64()
               }
             }

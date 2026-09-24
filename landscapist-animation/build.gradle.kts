@@ -73,7 +73,7 @@ kotlin {
         implementation(libs.jetbrains.compose.ui)
         // Skiko native runtime for the host OS, so the painter really rasterizes during the tests.
         // The classifier is resolved from the running host, so this works on any machine.
-        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skiko.get()}")
+        runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-${skikoHostTarget()}:${libs.versions.skikoOfficial.get()}")
       }
     }
   }

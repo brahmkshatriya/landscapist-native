@@ -35,6 +35,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        shell: bash
+        run: sdkmanager "ndk;28.2.13676358"
+
       - name: Restore Gradle properties and signing key
         shell: bash
         env:
@@ -82,7 +89,18 @@ jobs:
             :landscapist:publishToMavenCentral \
             :landscapist-core:publishToMavenCentral \
             :landscapist-image:publishToMavenCentral \
+            :landscapist-svg:publishToMavenCentral \
+            :landscapist-image-gallery:publishToMavenCentral \
             :landscapist-animation:publishToMavenCentral \
             :landscapist-placeholder:publishToMavenCentral \
             :landscapist-palette:publishToMavenCentral \
+            :landscapist-transformation:publishToMavenCentral \
+            :landscapist-zoomable:publishToMavenCentral \
+            :glide:publishToMavenCentral \
+            :coil:publishToMavenCentral \
+            :coil3:publishToMavenCentral \
+            :fresco:publishToMavenCentral \
+            :fresco-websupport:publishToMavenCentral \
+            :bom:publishToMavenCentral \
+            :version-catalog:publishToMavenCentral \
             --no-configuration-cache

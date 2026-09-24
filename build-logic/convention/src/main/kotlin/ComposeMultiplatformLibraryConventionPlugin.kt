@@ -47,11 +47,13 @@ class ComposeMultiplatformLibraryConventionPlugin : Plugin<Project> {
       }
 
       dependencies {
-        add("skiaMainImplementation", "org.jetbrains.skiko:skiko:0.150.1")
+        add("skiaMainImplementation", libs.findLibrary("skikoOfficial").get())
         add("desktopNativeMainImplementation", libs.findLibrary("compose-native-ui").get())
-        add("desktopNativeMainImplementation", "dev.brahmkshatriya.skiko:skiko:0.151.5")
+        add("desktopNativeMainImplementation", libs.findLibrary("skiko-native").get())
         add("baselineProfile", project(":benchmark-landscapist"))
       }
+
+      configureComposeNativeSkiaMetadataRepair(libs)
     }
   }
 }

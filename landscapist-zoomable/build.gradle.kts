@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import com.github.skydoves.landscapist.Configuration
+import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -57,6 +58,20 @@ kotlin {
     androidMain {
       dependencies {
         implementation(libs.androidx.core.ktx)
+      }
+    }
+
+    listOf(
+      "iosArm64Main",
+      "iosSimulatorArm64Main",
+    ).forEach { sourceSetName ->
+      val generatedAppleSources =
+        tasks.register<Sync>("prepare${sourceSetName.replaceFirstChar(Char::uppercaseChar)}AppleSources") {
+          from("src/appleTargetMain/kotlin")
+          into(layout.buildDirectory.dir("generated/appleTargetMain/$sourceSetName"))
+        }
+      named(sourceSetName) {
+        kotlin.srcDir(generatedAppleSources)
       }
     }
 
