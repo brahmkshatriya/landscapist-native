@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-  id("landscapist.library.compose.multiplatform")
+  id("landscapist.library.compose.multiplatformWasm")
   id("landscapist.spotless")
 }
 
