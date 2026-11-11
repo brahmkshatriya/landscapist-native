@@ -76,6 +76,7 @@ public final class com/skydoves/landscapist/ImageOptions {
 	public static final field $stable I
 	public static final field Companion Lcom/skydoves/landscapist/ImageOptions$Companion;
 	public static final field DEFAULT_IMAGE_SIZE I
+	public fun <init> ()V
 	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;Ljava/lang/Float;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (Landroidx/compose/ui/Alignment;Ljava/lang/String;Landroidx/compose/ui/layout/ContentScale;Landroidx/compose/ui/graphics/ColorFilter;FJLjava/lang/String;Ljava/lang/Float;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Landroidx/compose/ui/Alignment;

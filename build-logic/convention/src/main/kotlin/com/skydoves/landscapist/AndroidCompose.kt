@@ -18,6 +18,9 @@
 
 package com.skydoves.landscapist
 
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.HasHostTestsBuilder
+import com.android.build.api.variant.HostTestBuilder
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.Project
@@ -79,6 +82,14 @@ internal fun Project.configureAndroidCompose(
 }
 
 private fun Project.configureStabilityCheckTaskDependencies() {
+  extensions.getByType(AndroidComponentsExtension::class.java).beforeVariants { variant ->
+    // The stability analyzer realizes AGP 9.5's Compose Preview tasks for all variants.
+    (variant as HasHostTestsBuilder).hostTests.getValue(HostTestBuilder.UNIT_TEST_TYPE).apply {
+      enable = true
+      includeAndroidResources = true
+    }
+  }
+
   tasks.configureEach {
     if (name.endsWith("StabilityCheck")) {
       mustRunAfter(tasks.matching { it.name.contains("Kotlin") })

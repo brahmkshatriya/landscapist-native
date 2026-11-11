@@ -167,6 +167,7 @@ public final class com/skydoves/landscapist/core/LandscapistConfig$Companion {
 }
 
 public final class com/skydoves/landscapist/core/NetworkConfig {
+	public fun <init> ()V
 	public synthetic fun <init> (JJLjava/lang/String;Ljava/util/Map;ZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (JJLjava/lang/String;Ljava/util/Map;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-UwyO8pc ()J

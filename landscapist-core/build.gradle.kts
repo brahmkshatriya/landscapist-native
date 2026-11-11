@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION", "DEPRECATION_ERROR")
-
 /*
  * Designed and developed by 2020-2023 skydoves (Jaewoong Eum)
  *
@@ -15,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION", "DEPRECATION_ERROR")
+
 import com.github.skydoves.landscapist.Configuration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile

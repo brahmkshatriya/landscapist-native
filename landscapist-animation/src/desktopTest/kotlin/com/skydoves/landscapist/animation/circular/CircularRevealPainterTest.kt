@@ -15,6 +15,7 @@
  */
 package com.skydoves.landscapist.animation.circular
 
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.platform.registerSkikoComposeImplementation
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.test.Test
@@ -38,6 +40,11 @@ import kotlin.test.assertTrue
  * That is issue #431: with a `CircularRevealPlugin` every content scale rendered as `Crop`.
  */
 class CircularRevealPainterTest {
+
+  init {
+    @OptIn(InternalComposeUiApi::class)
+    registerSkikoComposeImplementation()
+  }
 
   private val red = Color(0xFFFF0000)
   private val green = Color(0xFF00FF00)
